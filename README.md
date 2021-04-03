@@ -4,7 +4,7 @@ This plugin provides simple UI access (via Tools->Virtual Camera Placeholder) fo
 
 Prerequisites:
 
-    On MacOS, the mac-virtualcam module has been modified to support this plugin. That modification was added AFTER 26.1.2 was released, so you'll have to build OBS yourself, or wait for the next release following 26.1.2.
+On MacOS, the mac-virtualcam module has been modified to support this plugin. That modification was added AFTER 26.1.2 was released, so you'll have to build OBS yourself, or wait for the next release following 26.1.2.
 
-    On Windows, I've submitted a Pull Request (https://github.com/obsproject/obs-studio/pull/4446) to support a custom placeholder.png file on Windows. This plugin won't really do anything on Windiws until the suporting change is made in the OBS win-dshow virtualcam-module.
+On Windows, I've submitted a Pull Request (https://github.com/obsproject/obs-studio/pull/4446) to support a custom placeholder.png file on Windows. This plugin won't really do anything on Windiws until the suporting change is made in the OBS win-dshow virtualcam-module.
     
