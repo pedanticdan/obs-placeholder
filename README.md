@@ -8,3 +8,4 @@ On MacOS, the mac-virtualcam module has been modified to support this plugin. Th
 
 On Windows, I've submitted a Pull Request to support a custom placeholder.png file on Windows. This plugin won't really do anything on Windows until the suporting change is made in the OBS win-dshow virtualcam-module.
     
+
