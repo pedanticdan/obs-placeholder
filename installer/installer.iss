@@ -2,15 +2,15 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "obs-placeholder"
-#define MyAppVersion "4.9.0"
-#define MyAppPublisher "Stephane Lepin"
-#define MyAppURL "http://github.com/Palakis/obs-placeholder"
+#define MyAppVersion "0.0.2"
+#define MyAppPublisher "Dan Campbell"
+#define MyAppURL "http://github.com/pedandicdan/obs-placeholder"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{117EE44F-48E1-49E5-A381-CC8D9195CF35}
+AppId={{193755A5-80BE-4ADB-AFB0-55FD0562CC80}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}
