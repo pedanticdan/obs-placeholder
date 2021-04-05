@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>685</width>
-    <height>270</height>
+    <height>240</height>
    </rect>
   </property>
   <property name="acceptDrops">
@@ -74,23 +74,23 @@
       <property name="minimumSize">
        <size>
         <width>440</width>
-        <height>50</height>
+        <height>30</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
         <width>440</width>
-        <height>50</height>
+        <height>30</height>
        </size>
       </property>
       <property name="baseSize">
        <size>
         <width>440</width>
-        <height>50</height>
+        <height>30</height>
        </size>
       </property>
       <property name="text">
-       <string>file name</string>
+       <string/>
       </property>
       <property name="cursorPosition">
        <number>0</number>
@@ -101,20 +101,20 @@
      <widget class="QPushButton" name="pushButton">
       <property name="minimumSize">
        <size>
-        <width>140</width>
-        <height>50</height>
+        <width>120</width>
+        <height>30</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
-        <width>140</width>
-        <height>60</height>
+        <width>120</width>
+        <height>30</height>
        </size>
       </property>
       <property name="baseSize">
        <size>
-        <width>140</width>
-        <height>50</height>
+        <width>120</width>
+        <height>30</height>
        </size>
       </property>
       <property name="text">
@@ -124,13 +124,13 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>230</x>
-     <y>190</y>
-     <width>221</width>
-     <height>24</height>
+     <x>120</x>
+     <y>160</y>
+     <width>453</width>
+     <height>32</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -139,13 +139,74 @@
     </property>
     <item>
      <widget class="QPushButton" name="cancelButton">
+      <property name="minimumSize">
+       <size>
+        <width>80</width>
+        <height>30</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>80</width>
+        <height>30</height>
+       </size>
+      </property>
+      <property name="baseSize">
+       <size>
+        <width>80</width>
+        <height>30</height>
+       </size>
+      </property>
       <property name="text">
-       <string>Placeholder.Settings.Cancel</string>
+       <string>CancelPlaceholder.Settings.Cancel</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="Reset">
+      <property name="minimumSize">
+       <size>
+        <width>120</width>
+        <height>30</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>120</width>
+        <height>30</height>
+       </size>
+      </property>
+      <property name="baseSize">
+       <size>
+        <width>120</width>
+        <height>30</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>Placeholder.Settings.Reset</string>
       </property>
      </widget>
     </item>
     <item>
      <widget class="QPushButton" name="saveButton">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>30</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>30</height>
+       </size>
+      </property>
+      <property name="baseSize">
+       <size>
+        <width>0</width>
+        <height>30</height>
+       </size>
+      </property>
       <property name="text">
        <string>Placeholder.Settings.Save</string>
       </property>
@@ -157,14 +218,14 @@
  <resources/>
  <connections>
   <connection>
-   <sender>saveButton</sender>
+   <sender>cancelButton</sender>
    <signal>clicked()</signal>
    <receiver>Dialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>267</x>
-     <y>204</y>
+     <x>188</x>
+     <y>195</y>
     </hint>
     <hint type="destinationlabel">
      <x>263</x>
@@ -173,18 +234,34 @@
    </hints>
   </connection>
   <connection>
-   <sender>cancelButton</sender>
+   <sender>saveButton</sender>
    <signal>clicked()</signal>
    <receiver>Dialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>401</x>
-     <y>203</y>
+     <x>548</x>
+     <y>194</y>
     </hint>
     <hint type="destinationlabel">
      <x>411</x>
      <y>162</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Reset</sender>
+   <signal>clicked()</signal>
+   <receiver>lineEdit</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>290</x>
+     <y>186</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>114</x>
+     <y>110</y>
     </hint>
    </hints>
   </connection>

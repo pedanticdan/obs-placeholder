@@ -40,6 +40,5 @@ public:
 
 private:
 	Ui::Dialog *ui;
-	config_t *obsConfig;
 };
 #endif // DIALOG_H

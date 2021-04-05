@@ -16,7 +16,7 @@ Dialog::Dialog(QWidget *parent)
 
 	blog(LOG_INFO, "Get config");
 
-	obsConfig = obs_frontend_get_profile_config();
+	config_t *obsConfig = obs_frontend_get_profile_config();
 
 	blog(LOG_INFO, "Get path to custom png");
 	const char *png = config_get_string(obsConfig, SECTION_NAME, PARAM_PNG);
@@ -30,13 +30,18 @@ void Dialog::savePlaceholder()
 	blog(LOG_INFO, "savePlaceholder");
 	std::string str = ui->lineEdit->text().toStdString();
 	const char *fileName = str.c_str();
+	blog(LOG_INFO, "get text from widget [%s]", fileName);
+	config_t *obsConfig = obs_frontend_get_profile_config();
 	config_set_string(obsConfig, SECTION_NAME, PARAM_PNG, fileName);
+	blog(LOG_INFO, "set text in config [%s][%s]", SECTION_NAME, PARAM_PNG);
 	char *custom = os_get_config_path_ptr(PLACEHOLDER_DIR);
 	int ret;
 	if (!os_file_exists(custom))
 		os_mkdirs(custom);
 	bfree(custom);
+	blog(LOG_INFO, "make sure dir exists [%s]", custom);
 	custom = os_get_config_path_ptr(PLACEHOLDER_PNG);
+	blog(LOG_INFO, "get file path [%s]", custom);
 	if (os_file_exists(fileName)) {
 		if (os_file_exists(custom))
 			ret = os_unlink(custom);
@@ -46,6 +51,8 @@ void Dialog::savePlaceholder()
 			ret = os_unlink(custom);
 	}
 	bfree(custom);
+	config_save(obsConfig);
+	blog(LOG_INFO, "exit savePlaceholder");
 }
 
 void Dialog::browse()
