@@ -19,6 +19,6 @@ When a user selects a PNG file using the above dialog, the plugin will:
 
     B) Locate the standard application support directory (creating it if necessary)
 
-    C) Copy the user-select PNG file to standard application support directory as placeholder.png
+    C) Copy the user-select PNG file to the standard application support directory as placeholder.png
 
 If the user clears the text box in the file selection dialog, the plugin will delete the custom placeholder.png file from the standard application support directory. The result is that the Virtual Camera module will use the default placeholder.png file.
