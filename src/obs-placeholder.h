@@ -26,4 +26,5 @@ obs-placeholder
 
 #define OBS_PLACEHOLDER_VERSION "0.0.3"
 
-#define blog(level, msg, ...) blog(level, "[obs-placeholder] " msg, ##__VA_ARGS__)
+#define blog(level, msg, ...)                                                  \
+  blog(level, "[obs-placeholder] " msg, ##__VA_ARGS__)
