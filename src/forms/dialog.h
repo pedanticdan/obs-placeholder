@@ -35,6 +35,7 @@ public:
     Dialog(QWidget *parent = nullptr);
     ~Dialog();
 
+    void showEvent(QShowEvent* event);
     void browse();
     void savePlaceholder();
 

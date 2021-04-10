@@ -13,6 +13,9 @@ Dialog::Dialog(QWidget *parent)
     ui->setupUi(this);
     connect(ui->pushButton, &QAbstractButton::clicked, this, &Dialog::browse);
     connect(ui->saveButton, &QAbstractButton::clicked, this, &Dialog::savePlaceholder);
+	QString newTitle = this->windowTitle() + " v" + OBS_PLACEHOLDER_VERSION;
+
+	this->setWindowTitle(newTitle);
 
 	blog(LOG_INFO, "Get config");
 
@@ -55,10 +58,24 @@ void Dialog::savePlaceholder()
 	blog(LOG_INFO, "exit savePlaceholder");
 }
 
+void Dialog::showEvent(QShowEvent* event) {
+	config_t *obsConfig = obs_frontend_get_profile_config();
+	const char *png = config_get_string(obsConfig, SECTION_NAME, PARAM_PNG);
+	ui->lineEdit->setText(png);
+}
+
+
 void Dialog::browse()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Select PNG File"),"/path/to/file/",tr("PNG File (*.png)"));
-    ui->lineEdit->setText(fileName);
+	config_t *obsConfig = obs_frontend_get_profile_config();
+	const char *png = config_get_string(obsConfig, SECTION_NAME, PARAM_PNG);
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Select PNG File"),png,tr("PNG File (*.png)"));
+	if (fileName.length() == 0) {
+    	ui->lineEdit->setText(png);
+	} else {
+    	ui->lineEdit->setText(fileName);
+	}
+
 }
 
 Dialog::~Dialog()
