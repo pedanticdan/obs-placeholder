@@ -16,7 +16,7 @@ export QT_CELLAR_PREFIX="$(/usr/bin/find /usr/local/Cellar/qt -d 1 | sort -t '.'
 #GIT_BRANCH_OR_TAG=$(git name-rev --name-only HEAD | awk -F/ '{print $NF}')
 
 #VERSION="$GIT_HASH-$GIT_BRANCH_OR_TAG"
-VERSION=0.0.1
+VERSION=1.0.0
 
 FILENAME_UNSIGNED="obs-placeholder-$VERSION-Unsigned.pkg"
 FILENAME="obs-placeholder-$VERSION.pkg"
@@ -35,7 +35,9 @@ install_name_tool \
 echo "[obs-placeholder] Dependencies for obs-placeholder"
 otool -L ./build/obs-placeholder.so
 
-RELEASE_MODE="False"
+RELEASE_MODE="True"
+CODE_SIGNING_IDENTITY="Developer ID Application: Daniel CAMPBELL (2CUNW53A27)"
+INSTALLER_SIGNING_IDENTITY="Developer ID Installer: Daniel CAMPBELL (2CUNW53A27)"
 
 if [[ "$RELEASE_MODE" == "True" ]]; then
 	echo "[obs-placeholder] Signing plugin binary: obs-placeholder.so"
