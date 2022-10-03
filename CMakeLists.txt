@@ -1,152 +1,85 @@
-cmake_minimum_required(VERSION 3.5)
-project(obs-placeholder VERSION 1.0.0)
+cmake_minimum_required(VERSION 3.16...3.21)
 
-set(CMAKE_PREFIX_PATH "${QTDIR}")
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
+# Change obs-plugintemplate to your plugin's name in a machine-readable format (e.g.:
+# obs-myawesomeplugin) and set
+project(obs-placeholder VERSION 1.2.1)
+add_library(${CMAKE_PROJECT_NAME} MODULE)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# Replace `Your Name Here` with the name (yours or your organization's) you want to see as the
+# author of the plugin (in the plugin's metadata itself and in the installers)
+set(PLUGIN_AUTHOR "Dan Campbell")
 
-if (WIN32 OR APPLE)
- 	include(external/FindLibObs.cmake)
-endif()
+# Replace `com.example.obs-plugin-template` with a unique Bundle ID for macOS releases (used both in
+# the installer and when submitting the installer for notarization)
+set(MACOS_BUNDLEID "com.example.${CMAKE_PROJECT_NAME}")
 
-find_package(LibObs REQUIRED)
-find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
+# Replace `me@contoso.com` with the maintainer email address you want to put in Linux packages
+set(LINUX_MAINTAINER_EMAIL "")
 
-set(obs-placeholder_SOURCES
-	src/obs-placeholder.cpp
-	src/forms/dialog.cpp)
+# Add your custom source files here - header files are optional and only required for visibility
+# e.g. in Xcode or Visual Studio
+target_sources(${CMAKE_PROJECT_NAME} PRIVATE src/obs-placeholder.cpp src/obs-placeholder.h src/forms/dialog.cpp)
 
-set(obs-placeholder_HEADERS
-	src/forms/dialog.h)
+# Import libobs as main plugin dependency
+find_package(libobs REQUIRED)
+include(cmake/ObsPluginHelpers.cmake)
+
+# Uncomment these lines if you want to use the OBS Frontend API in your plugin
+find_package(obs-frontend-api REQUIRED)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OBS::obs-frontend-api Qt::Core Qt::Widgets)
+
+# Uncomment those lines if you want to use Qt in your plugin
+find_qt(COMPONENTS Widgets Core)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt::Core Qt::Widgets)
+set_target_properties(
+  ${CMAKE_PROJECT_NAME}
+  PROPERTIES AUTOMOC ON
+             AUTOUIC ON
+             AUTORCC ON)
+
+configure_file(src/plugin-macros.h.in ${CMAKE_SOURCE_DIR}/src/plugin-macros.generated.h)
+
+target_sources(${CMAKE_PROJECT_NAME} PRIVATE src/plugin-macros.generated.h)
+
+# /!\ TAKE NOTE: No need to edit things past this point /!\
 
 # --- Platform-independent build settings ---
-add_library(obs-placeholder MODULE
-	${obs-placeholder_SOURCES}
-	${obs-placeholder_HEADERS})
 
-include_directories(
-	"${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api"
-	${Qt5Core_INCLUDES}
-	${Qt5Widgets_INCLUDES})
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
-target_link_libraries(obs-placeholder
-	libobs
-	Qt5::Core
-	Qt5::Widgets)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OBS::libobs)
 
 # --- End of section ---
 
 # --- Windows-specific build settings and tasks ---
-if(WIN32)
-	if(NOT DEFINED OBS_FRONTEND_LIB)
-		set(OBS_FRONTEND_LIB "OBS_FRONTEND_LIB-NOTFOUND" CACHE FILEPATH "OBS frontend library")
-		message(FATAL_ERROR "Could not find OBS Frontend API's library !")
-	endif()
+if(OS_WINDOWS)
+  configure_file(cmake/bundle/windows/installer-Windows.iss.in
+                 ${CMAKE_BINARY_DIR}/installer-Windows.generated.iss)
 
-    if(MSVC)
-        # Enable Multicore Builds and disable FH4 (to not depend on VCRUNTIME140_1.DLL)
-	    add_definitions(/MP /d2FH4-)
-    endif()
+  configure_file(cmake/bundle/windows/resource.rc.in ${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}.rc)
+  target_sources(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}.rc)
 
-	add_definitions(-D_WEBSOCKETPP_CPP11_STL_)
+  if(MSVC)
+    target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE /W4)
+  endif()
+  # --- End of section ---
 
-	if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-		set(ARCH_NAME "64bit")
-		set(OBS_BUILDDIR_ARCH "build64")
-	else()
-		set(ARCH_NAME "32bit")
-		set(OBS_BUILDDIR_ARCH "build32")
-	endif()
+  # -- macOS specific build settings and tasks --
+elseif(OS_MACOS)
+  configure_file(cmake/bundle/macos/installer-macos.pkgproj.in
+                 ${CMAKE_BINARY_DIR}/installer-macos.generated.pkgproj)
 
-	include_directories(
-		"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/UI"
-	)
+  set(MACOSX_PLUGIN_GUI_IDENTIFIER "${MACOS_BUNDLEID}")
+  set(MACOSX_PLUGIN_BUNDLE_VERSION "${CMAKE_PROJECT_VERSION}")
+  set(MACOSX_PLUGIN_SHORT_VERSION_STRING "1")
 
-	target_link_libraries(obs-placeholder
-		"${OBS_FRONTEND_LIB}")
+  target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE -Wall)
+  # --- End of section ---
 
-	# --- Release package helper ---
-	# The "release" folder has a structure similar OBS' one on Windows
-	set(RELEASE_DIR "${PROJECT_SOURCE_DIR}/release")
-
-	add_custom_command(TARGET obs-placeholder POST_BUILD
-		# If config is Release, package release files
-		COMMAND if $<CONFIG:Release>==1 (
-			"${CMAKE_COMMAND}" -E make_directory
-			"${RELEASE_DIR}/data/obs-plugins/obs-placeholder"
-			"${RELEASE_DIR}/obs-plugins/${ARCH_NAME}")
-
-		COMMAND if $<CONFIG:Release>==1 ("${CMAKE_COMMAND}" -E copy_directory
-			"${PROJECT_SOURCE_DIR}/data"
-			"${RELEASE_DIR}/data/obs-plugins/obs-placeholder")
-
-		COMMAND if $<CONFIG:Release>==1 ("${CMAKE_COMMAND}" -E copy
-			"$<TARGET_FILE:obs-placeholder>"
-			"${RELEASE_DIR}/obs-plugins/${ARCH_NAME}")
-
-		# In Release mode, copy Qt image format plugins
-		COMMAND if $<CONFIG:Release>==1 (
-			"${CMAKE_COMMAND}" -E copy
-			"${QTDIR}/plugins/imageformats/qjpeg.dll"
-			"${RELEASE_DIR}/bin/${ARCH_NAME}/imageformats/qjpeg.dll")
-		COMMAND if $<CONFIG:RelWithDebInfo>==1 (
-			"${CMAKE_COMMAND}" -E copy
-			"${QTDIR}/plugins/imageformats/qjpeg.dll"
-			"${RELEASE_DIR}/bin/${ARCH_NAME}/imageformats/qjpeg.dll")
-
-		# If config is RelWithDebInfo, package release files
-		COMMAND if $<CONFIG:RelWithDebInfo>==1 (
-			"${CMAKE_COMMAND}" -E make_directory
-			"${RELEASE_DIR}/data/obs-plugins/obs-placeholder"
-			"${RELEASE_DIR}/obs-plugins/${ARCH_NAME}")
-
-		COMMAND if $<CONFIG:RelWithDebInfo>==1 ("${CMAKE_COMMAND}" -E copy_directory
-			"${PROJECT_SOURCE_DIR}/data"
-			"${RELEASE_DIR}/data/obs-plugins/obs-placeholder")
-
-		COMMAND if $<CONFIG:RelWithDebInfo>==1 ("${CMAKE_COMMAND}" -E copy
-			"$<TARGET_FILE:obs-placeholder>"
-			"${RELEASE_DIR}/obs-plugins/${ARCH_NAME}")
-
-		COMMAND if $<CONFIG:RelWithDebInfo>==1 ("${CMAKE_COMMAND}" -E copy
-			"$<TARGET_PDB_FILE:obs-placeholder>"
-			"${RELEASE_DIR}/obs-plugins/${ARCH_NAME}")
-
-		# Copy to obs-studio dev environment for immediate testing
-		COMMAND if $<CONFIG:Debug>==1 (
-			"${CMAKE_COMMAND}" -E copy
-				"$<TARGET_FILE:obs-placeholder>"
-				"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/rundir/$<CONFIG>/obs-plugins/${ARCH_NAME}")
-
-		COMMAND if $<CONFIG:Debug>==1 (
-			"${CMAKE_COMMAND}" -E copy
-				"$<TARGET_PDB_FILE:obs-placeholder>"
-				"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/rundir/$<CONFIG>/obs-plugins/${ARCH_NAME}")
-
-		COMMAND if $<CONFIG:Debug>==1 (
-			"${CMAKE_COMMAND}" -E make_directory
-				"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/rundir/$<CONFIG>/data/obs-plugins/obs-placeholder")
-
-		COMMAND if $<CONFIG:Debug>==1 (
-			"${CMAKE_COMMAND}" -E copy_directory
-				"${PROJECT_SOURCE_DIR}/data"
-				"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/rundir/$<CONFIG>/data/obs-plugins/obs-placeholder")
-	)
-	# --- End of sub-section ---
-
+  # --- Linux-specific build settings and tasks ---
+else()
+  target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE -Wall)
 endif()
 # --- End of section ---
 
-# -- OS X specific build settings and tasks --
-if(APPLE)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -fvisibility=default")
-
-	set(CMAKE_SKIP_RPATH TRUE)
-	set_target_properties(obs-placeholder PROPERTIES PREFIX "")
-	target_link_libraries(obs-placeholder "${OBS_FRONTEND_LIB}")
-endif()
-# -- End of section --
+setup_plugin_target(${CMAKE_PROJECT_NAME})

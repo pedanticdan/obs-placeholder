@@ -55,7 +55,6 @@ void Dialog::savePlaceholder() {
   config_set_string(obsConfig, SECTION_NAME, PARAM_PNG, fileName);
   blog(LOG_INFO, "set text in config [%s][%s]", SECTION_NAME, PARAM_PNG);
   char *custom = os_get_config_path_ptr(PLACEHOLDER_DIR);
-  int ret;
   if (!os_file_exists(custom))
     os_mkdirs(custom);
   bfree(custom);
@@ -64,11 +63,11 @@ void Dialog::savePlaceholder() {
   blog(LOG_INFO, "get file path [%s]", custom);
   if (os_file_exists(fileName)) {
     if (os_file_exists(custom))
-      ret = os_unlink(custom);
-    ret = os_copyfile(fileName, custom);
+      os_unlink(custom);
+    os_copyfile(fileName, custom);
   } else {
     if (strlen(fileName) == 0)
-      ret = os_unlink(custom);
+      os_unlink(custom);
   }
   bfree(custom);
   config_save(obsConfig);
@@ -76,16 +75,18 @@ void Dialog::savePlaceholder() {
 }
 
 void Dialog::showEvent(QShowEvent *event) {
-  config_t *obsConfig = obs_frontend_get_profile_config();
-  const char *png = config_get_string(obsConfig, SECTION_NAME, PARAM_PNG);
-  ui->lineEdit->setText(png);
+  if (event != NULL) {
+    config_t *obsConfig = obs_frontend_get_profile_config();
+    const char *png = config_get_string(obsConfig, SECTION_NAME, PARAM_PNG);
+    ui->lineEdit->setText(png);
+  }
 }
 
 void Dialog::browse() {
   config_t *obsConfig = obs_frontend_get_profile_config();
   const char *png = config_get_string(obsConfig, SECTION_NAME, PARAM_PNG);
   QString fileName = QFileDialog::getOpenFileName(this, tr("Select PNG File"),
-                                                  png, tr("PNG File (*.png)"));
+                                                  png, tr("Images (*.png *.jpg *.bmp)"));
   if (fileName.length() == 0) {
     ui->lineEdit->setText(png);
   } else {

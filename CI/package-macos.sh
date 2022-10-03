@@ -16,7 +16,7 @@ export QT_CELLAR_PREFIX="$(/usr/bin/find /usr/local/Cellar/qt -d 1 | sort -t '.'
 #GIT_BRANCH_OR_TAG=$(git name-rev --name-only HEAD | awk -F/ '{print $NF}')
 
 #VERSION="$GIT_HASH-$GIT_BRANCH_OR_TAG"
-VERSION=1.0.0
+VERSION=1.1.0
 
 FILENAME_UNSIGNED="obs-placeholder-$VERSION-Unsigned.pkg"
 FILENAME="obs-placeholder-$VERSION.pkg"
@@ -59,6 +59,8 @@ if [[ "$RELEASE_MODE" == "True" ]]; then
 		./release/$FILENAME_UNSIGNED \
 		./release/$FILENAME
 	rm ./release/$FILENAME_UNSIGNED
+
+#exit
 
 	echo "[obs-placeholder] Submitting installer $FILENAME for notarization"
 	zip -r ./release/$FILENAME.zip ./release/$FILENAME

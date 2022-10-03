@@ -28,7 +28,9 @@ obs-placeholder
 #include "forms/dialog.h"
 #include "obs-placeholder.h"
 #include <QtCore/QTimer>
+#if 0
 #include <QtWidgets/QAction>
+#endif
 #include <QtWidgets/QMainWindow>
 
 /* Defines common functions (required) */
@@ -48,7 +50,6 @@ static void profile_changed(enum obs_frontend_event event,
     char *custom = os_get_config_path_ptr(PLACEHOLDER_DIR);
     blog(LOG_INFO, "obs-placeholder path to placeholder dir '%s'", custom);
 
-    int ret;
     if (!os_file_exists(custom))
       os_mkdirs(custom);
     bfree(custom);
@@ -59,14 +60,14 @@ static void profile_changed(enum obs_frontend_event event,
       blog(LOG_INFO, "obs-placeholder exists [%s]", png);
       if (os_file_exists(custom)) {
         blog(LOG_INFO, "obs-placeholder exists [%s]", custom);
-        ret = os_unlink(custom);
+        os_unlink(custom);
       }
       blog(LOG_INFO, "obs-placeholder copy [%s] to [%s]", png, custom);
-      ret = os_copyfile(png, custom);
+      os_copyfile(png, custom);
     } else {
       blog(LOG_INFO, "obs-placeholder does not exist or not configured");
       blog(LOG_INFO, "obs-placeholder unlink [%s]", custom);
-      ret = os_unlink(custom);
+      os_unlink(custom);
     }
     bfree(custom);
   }
